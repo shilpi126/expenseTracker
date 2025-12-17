@@ -1,3 +1,5 @@
+const API_URL = "http://localhost:8000/expences";
+
 function handleFormSubmit(event) {
   event.preventDefault();
   const amount = document.getElementById('amount').value;
@@ -5,7 +7,7 @@ function handleFormSubmit(event) {
   const category = document.getElementById('category').value;
   
   const myObj = {
-      id: Date.now(),
+      //id: Date.now(),
       amount: amount,
       description: description,
       category: category
@@ -22,9 +24,13 @@ function handleFormSubmit(event) {
 }
 
 function addExpense(expense) {
-  let expenses = JSON.parse(localStorage.getItem('expenseDetails')) || [];
-  expenses.push(expense);
-  localStorage.setItem('expenseDetails', JSON.stringify(expenses));
+  // let expenses = JSON.parse(localStorage.getItem('expenseDetails')) || [];
+  // expenses.push(expense);
+  // localStorage.setItem('expenseDetails', JSON.stringify(expenses));
+
+  axios.post(`${API_URL}/add`,expense)
+    .then((res)=>console.log("Expense added sucessfully",res))
+    .catch((err)=>console.log("Some error in register function",err))
 }
 
 function showUserONScreeen(expenses) {
@@ -44,7 +50,7 @@ function showUserONScreeen(expenses) {
     
       deleteBtn.addEventListener("click", function () {
           deleteExpense(expense.id);
-          refreshDisplay(); 
+          //refreshDisplay(); 
       });
       
 
@@ -55,9 +61,9 @@ function showUserONScreeen(expenses) {
       
 
       editBtn.addEventListener("click", function () {
-        deleteExpense(expense.id);
-        refreshDisplay(); 
-          editExpense(expense,expense.id);
+        //deleteExpense(expense.id);
+        //refreshDisplay(); 
+        editExpense(expense,expense.id);
           
       });
 
@@ -67,14 +73,23 @@ function showUserONScreeen(expenses) {
   });
 }
 
+
+
 function deleteExpense(id) {
-  if(localStorage.getItem('expenseDetails')){
-    let expenses = JSON.parse(localStorage.getItem('expenseDetails'));
-    expenses = expenses.filter(expense => expense.id !== id);
-    localStorage.setItem('expenseDetails', JSON.stringify(expenses));
-  }else{
-    alert("Data not persist");
-  }
+  // if(localStorage.getItem('expenseDetails')){
+  //   let expenses = JSON.parse(localStorage.getItem('expenseDetails'));
+  //   expenses = expenses.filter(expense => expense.id !== id);
+  //   localStorage.setItem('expenseDetails', JSON.stringify(expenses));
+    
+  // }else{
+  //   alert("Data not persist");
+  // }
+
+
+   console.log(id)
+    axios.delete(`${API_URL}/delete/${id}`)
+    .then((res)=>console.log(res))
+    .catch((err)=>console.log(err))
 
 }
 
@@ -87,14 +102,33 @@ function editExpense(expense, id){
   handleFormSubmit();
 }
 
-function refreshDisplay() {
-  if(localStorage.getItem('expenseDetails')){
-  const expenses = JSON.parse(localStorage.getItem('expenseDetails'));
-  showUserONScreeen(expenses);
-  }else{
-    alert("Data not persist");
-  }
+
+
+
+
+window.addEventListener("DOMContentLoaded", function(){
+    
+async function getData () {
+    await axios.get(`${API_URL}/get_data`)
+    .then((res)=>showUserONScreeen(res.data))
+    .catch((err)=>console.log(err))
+
 }
+getData()
+})
 
 
-refreshDisplay();
+
+// function refreshDisplay() {
+//   if(localStorage.getItem('expenseDetails')){
+//   const expenses = JSON.parse(localStorage.getItem('expenseDetails'));
+//   showUserONScreeen(expenses);
+//   }else{
+//     alert("Data not persist");
+//   }
+
+  
+// }
+// refreshDisplay();
+
+
